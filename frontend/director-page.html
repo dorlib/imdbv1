@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Directors</title>
+    </head>
+   
+    <body>
+        <nav>
+            <a href="/site">Back to main page</a>
+        </nav>
+        <h2>Welcome To The Page Of The Director:</h2>
+        {{ .Name }}:
+        <h2>Which Made The Following Movies:</h2>
+        {{$dv = .moviesOfDirector}}
+    </body>
+
+</html>

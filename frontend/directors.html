@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta name="directors" content="with=device-width, initial-scale=1.0">
+        <title>IMDB</title>
+        <link rel="stylesheet" href="directorsStype.css">
+    </head>
+   
+    <body>
+        <nav>
+            <a href="./site">Back to main page</a>
+        </nav>
+    
+        <h2>All Directors Are</h2>
+        {{ range $director := . }}
+             <p>
+                <a href="/director/{{.ID}}">{{$director.Name}} </a>
+             </p>
+        {{ end }}
+    
+        
+    </body>
+
+</html>

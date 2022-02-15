@@ -2,6 +2,7 @@ package main
 
 import (
 	"IMDB/ent"
+	"IMDB/ent/director"
 	"IMDB/ent/movie"
 	"context"
 	"fmt"
@@ -97,6 +98,61 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 	})
 }
 
+func submissionHandler(t *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+
+/*
+
+func processor(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "Post" {
+		http.Redirect(w, r, "/site", http.StatusSeeOther)
+		return
+	}
+	mName := r.FormValue("movie")
+	mDirector := r.FormValue("director")
+	mRank := r.FormValue("rank")
+	mDescription := r.FormValue("extra")
+
+
+}
+
+*/
+
+func directorsHandler(t *template.Template, c *ent.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		top10, err := c.Director.Query().Order(ent.Asc(director.FieldName)).All(r.Context())
+		if err != nil {
+			panic(err)
+		}
+		if err := t.Execute(w, top10); err != nil {
+			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+
+func directorPageHandler(t *template.Template, c *ent.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := path.Base(r.URL.Path) // a/b/c/d => d, a/b => b, a => a
+		idInt, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		director := c.Director.GetX(r.Context(), int(idInt))
+		if err := t.Execute(w, director); err != nil {
+			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
+		}
+		moviesOfDirector, err := c.Director.Query().QueryMovies().Order(ent.Asc(director.Name)).All(r.Context())
+		if err := t.Execute(w, moviesOfDirector); err != nil {
+			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+
 func main() {
 	client, err := ent.Open("mysql", "root:pass@tcp(127.0.0.1:3306)/test")
 	if err != nil {
@@ -125,6 +181,9 @@ func main() {
 	allTpl := template.Must(template.ParseFiles("frontend/all.html"))
 	addTpl := template.Must(template.ParseFiles("frontend/add.html"))
 	movieTpl := template.Must(template.ParseFiles("frontend/movie-page.html"))
+	submissionTpl := template.Must(template.ParseFiles("frontend/submission.html"))
+	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
+	directorPafeTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
@@ -132,6 +191,9 @@ func main() {
 	http.Handle("/all", allHandler(allTpl, client))
 	http.Handle("/add", addhHandler(addTpl))
 	http.Handle("/movie/", moviePageHandler(movieTpl, client))
+	http.Handle("/submission.html", submissionHandler(submissionTpl))
+	http.Handle("/directors", directorsHandler(directorsTpl, client))
+	http.Handle("/director/", directorPageHandler(directorPafeTpl, client))
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("error running server (%s)", err)

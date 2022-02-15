@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>IMDB</title>
+    </head>
+   
+    <body>
+        <nav>
+            <a href="/site">Back to main page</a>
+        </nav>
+        <h2>Welcome To The Page Of The Movie:</h2>
+        {{ .Name }}:
+
+       <h4>{{ .Description }}</h4>  
+        
+        <h2>(Rank: {{ .Rank}}/100)</h2>
+    </body>
+
+</html>

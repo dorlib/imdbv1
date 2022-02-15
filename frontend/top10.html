@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta name="top10" content="with=device-width, initial-scale=1.0">
+        <title>IMDB</title>
+        <link rel="stylesheet" href="top10Stype.css">
+    </head>
+   
+    <body>
+        <nav>
+            <a href="./site">Back to main page</a>
+        </nav>
+    
+        <h2>the top 10 rated movies</h2>
+        {{ range $movie := . }}
+             <p>
+                  <a href="/movie/{{.ID}}">{{$movie.Name}}, {{$movie.Rank}}/100</a>
+             </p>
+        {{ end }}
+    
+        
+    </body>
+
+</html>

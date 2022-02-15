@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="add" content="with=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="addStyle.css">
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <title>Forms Review</title>
+  </head>
+  <body>
+    <nav>
+        <a href="./site">Back to main page</a>
+    </nav> 
+
+    <section id="overlay">
+      <img src="https://play-lh.googleusercontent.com/R5x56X7xOHZenDcDjP9q9qwWGg3iB7KKEz1KUMHbEurjDRXY4VLb3LBjOZ4u1_XiXzC-" alt="IMDB Logo" id="logo">
+      <hr>
+      <form action="submission.html" method="POST">
+				<h1>Create a Movie!</h1>
+        <section class="movie">
+          <label for="movie">What is the name of the movie?</label>
+    			<input type="text" name="movie" id="movie">
+        </section>
+        <hr>
+
+        <label for="director">What is the name of the director?</label>
+        <input type="text" name="director" id="director">
+      </section>
+      <hr>
+        
+        <section class="movies">
+          <label for="rank">Choose the rank that you like to give to this movie</label>
+          <input type="number" name="rank" id="rank" min="0" max="100">
+        </section>
+        <hr>
+        
+        <section class="worth watching">
+          <label for="doneness">How much do you think this movie is worth watching?</label>
+          <br>
+          <span>Doesn't Worth The Time</span>
+          <input type="range" name="doneness" id="doneness" value="3" min="1" max="5">
+          <span>You Must Watch It Now!</span>
+        </section>
+        <hr>
+        
+        <section class="cheesy">
+          <span>Does This Movie appropiate for childrens?</span>
+          <br>
+          <input type="radio" name="childerns" id="yes" value="yes">
+          <label for="yes">Yes</label>
+          <input type="radio" name="childerns" id="no" value="yes">
+          <label for="no">No</label>
+        </section>
+        <hr>
+       
+        <section class="genre-type">
+          <label for="genre">What is the genre of this movie?</label>
+          <select name="genre" id="genre">
+            <option value="action">Action</option>
+            <option value="drama">Drama</option>
+            <option value="comedy">Comedy</option>
+            <option value="crime">Crime</option>
+            <option value="animation">Animation</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="romance">Romance</option>
+            <option value="thriller">Thriller</option>
+            <option value="horror">Horror</option>
+            <option value="science fiction">Science Fiction</option>
+            <option value="historical">Historical</option>
+            <option value="western">Western</option>
+          </select>
+        </section>
+        <hr>
+
+        <section class="description">
+          <label for="extra">Please add a short description about the movie</label>
+          <br>
+          <textarea id="extra" name="extra" rows="3" cols="40"></textarea>
+        </section>
+        <hr>
+
+        <section class="review">
+            <label for="extra">Please add a short review about the movie</label>
+            <br>
+            <textarea id="extra" name="extra" rows="3" cols="40"></textarea>
+          </section>
+        <hr>
+
+        <section class="submission">
+          <input type="submit" value="Submit">
+        </section>
+      </form>
+    </section>
+  </body>
+</html>

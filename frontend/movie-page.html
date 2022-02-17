@@ -10,13 +10,18 @@
             <a href="/site">Back to main page</a>
         </nav>
         <h2>Welcome To The Page Of The Movie:</h2>
+        {{with .movie}}
         {{ .Name }}:
+        {{end}}
         <h2>By:</h2>
-        
-
+        {{with .directorOfMovie}}
+        {{ .Name}}
+        {{end}}
+        {{with .movie}}
        <h4>short description : {{ .Description }}</h4>  
         
         <h2>(Rank: {{ .Rank}}/100)</h2>
+        {{end}}
     </body>
 
 </html>

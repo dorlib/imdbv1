@@ -16,6 +16,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type M map[string]interface{}
+
 type Page struct {
 	Title string
 	Body  []byte
@@ -91,8 +93,14 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		if err != nil {
 			panic(err)
 		}
+
 		movie := c.Movie.GetX(r.Context(), int(idInt))
-		if err := t.Execute(w, movie); err != nil {
+		directorOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryDirector().OnlyX(r.Context())
+
+		if err := t.Execute(w, M{
+			"movie":           movie,
+			"directorOfMovie": directorOfMovie,
+		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
 	})
@@ -142,12 +150,14 @@ func directorPageHandler(t *template.Template, c *ent.Client) http.Handler {
 		if err != nil {
 			panic(err)
 		}
+
 		director := c.Director.GetX(r.Context(), int(idInt))
-		if err := t.Execute(w, director); err != nil {
-			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
-		}
-		moviesOfDirector, err := c.Director.Query().QueryMovies().Order(ent.Asc(director.Name)).All(r.Context())
-		if err := t.Execute(w, moviesOfDirector); err != nil {
+		directorMovies := c.Director.GetX(r.Context(), int(idInt)).QueryMovies().WithDirector().AllX(r.Context())
+
+		if err := t.Execute(w, M{
+			"director":       director,
+			"directorMovies": directorMovies,
+		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
 	})
@@ -183,7 +193,7 @@ func main() {
 	movieTpl := template.Must(template.ParseFiles("frontend/movie-page.html"))
 	submissionTpl := template.Must(template.ParseFiles("frontend/submission.html"))
 	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
-	directorPafeTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
+	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
@@ -193,7 +203,7 @@ func main() {
 	http.Handle("/movie/", moviePageHandler(movieTpl, client))
 	http.Handle("/submission.html", submissionHandler(submissionTpl))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
-	http.Handle("/director/", directorPageHandler(directorPafeTpl, client))
+	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("error running server (%s)", err)

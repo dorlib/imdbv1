@@ -10,9 +10,17 @@
             <a href="/site">Back to main page</a>
         </nav>
         <h2>Welcome To The Page Of The Director:</h2>
+        {{ with .director}}
         {{ .Name }}:
+        {{ end }}
         <h2>Which Made The Following Movies:</h2>
-        {{$dv = .moviesOfDirector}}
+        {{with .directorMovies}}
+            {{range .}}
+            <P>
+                <a href="/movie/{{.ID}}">{{.Name}}</a>
+            </P>
+            {{end}}
+        {{ end }}
     </body>
-
+ 
 </html>

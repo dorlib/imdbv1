@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <link>
     <title>Forms Review</title>
-    <link href="./addStyle.css" rel="stylesheet" type="text/css"/></link>
+    <link href="./addStyle.css" rel="stylesheet" type="text/css"/>
     <meta charset="utf-8">
     <meta name="add" content="with=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
@@ -15,11 +15,13 @@
     <section id="overlay">
       <img src="https://play-lh.googleusercontent.com/R5x56X7xOHZenDcDjP9q9qwWGg3iB7KKEz1KUMHbEurjDRXY4VLb3LBjOZ4u1_XiXzC-" alt="IMDB Logo" id="logo">
       <hr>
-      <form action="submission.html" method="POST">
+      <form action="submission.html" method="GET|POST">
 				<h1>Create a Movie!</h1>
         <section class="movie">
           <label for="movie">What is the name of the movie?</label>
     			<input type="text" name="movie" id="movie">
+          <label for="year">Year?</label>
+    			<input type="number" name="rank" id="rank" min="1940" max="2022">
         </section>
         <hr>
 
@@ -33,7 +35,7 @@
         <hr>
 
         
-
+      <section class="director">
         <label for="director">What is the name of the director?</label>
         <input type="text" name="director" id="director">
       </section>

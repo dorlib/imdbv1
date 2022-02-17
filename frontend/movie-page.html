@@ -11,8 +11,9 @@
         </nav>
         <h2>Welcome To The Page Of The Movie:</h2>
         {{with .movie}}
-        {{ .Name }}:
+        {{ .Name }}
         {{end}}
+
         <h2>By:</h2>
         {{with .directorOfMovie}}
         {{ .Name}}

@@ -163,6 +163,11 @@ func directorPageHandler(t *template.Template, c *ent.Client) http.Handler {
 	})
 }
 
+func cssHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseGlob("frontend/css/"))
+	tmpl.Execute(w, tmpl)
+}
+
 func main() {
 	client, err := ent.Open("mysql", "root:pass@tcp(127.0.0.1:3306)/test")
 	if err != nil {
@@ -204,6 +209,10 @@ func main() {
 	http.Handle("/submission.html", submissionHandler(submissionTpl))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
+
+	fs := http.FileServer(http.Dir("css"))
+	http.Handle("/frontend/css/", http.StripPrefix("/frontend/css/", fs))
+	http.HandleFunc("/css", cssHandler)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("error running server (%s)", err)

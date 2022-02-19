@@ -112,35 +112,29 @@ func submitHandler(t *template.Template, c *ent.Client) http.Handler {
 		if err := t.Execute(w, nil); err != nil {
 			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
 		}
-		if r.Method != "Post" {
+		if r.Method != "POST" {
 			http.Redirect(w, r, "/site", http.StatusSeeOther)
 			return
-		} else {
-			err := r.ParseForm()
-			if err != nil {
-				panic(err)
-			}
-
-			mDescription := r.FormValue("extra")
-			mName := r.FormValue("movie")
-			mDirector := r.FormValue("director")
-			mRank := r.FormValue("rank")
-			mRankInt, err := strconv.ParseInt(mRank, 10, 64)
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println(mRank)
-
-			newName := c.Movie.Create().SetName(mName).SetDescription(mDescription).SetRank(int(mRankInt)).SaveX(r.Context())
-			newDirector := c.Director.Create().SetName(mDirector).SaveX(r.Context())
-			newDirectorID := c.Director.Query().OnlyIDX(r.Context())
-			newDirec := c.Director.UpdateOneID(newDirectorID).AddMovies(newName).SaveX(r.Context())
-
-			fmt.Println("new movie added:", newName, "new Director added:", newDirector)
-			fmt.Println("new conecction made:", newDirec)
-
 		}
+
+		err := r.ParseForm()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		mDescription := r.PostForm.Get("extra")
+		mName := r.PostForm.Get("movie")
+		mDirector := r.PostForm.Get("director")
+		mRank, _ := strconv.Atoi(r.PostForm.Get("ranking"))
+
+		newMovie := c.Movie.Create().SetName(mName).SetDescription(mDescription).SetRank(mRank).SaveX(r.Context())
+		newDirector := c.Director.Create().SetName(mDirector).SaveX(r.Context())
+		newMovieID := c.Movie.Query().Where(movie.Name(newMovie.Name)).OnlyIDX(r.Context())
+		newMovieToDirector := c.Director.UpdateOne(newDirector).AddMovieIDs(newMovieID).SaveX(r.Context())
+
+		fmt.Println("new movie added:", newMovie, "new Director added:", newDirector)
+		fmt.Println("new conecction made:", newMovieToDirector)
+
 	})
 }
 

@@ -14,7 +14,7 @@ type Movie struct {
 // Fields of the Movie.
 func (Movie) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name"),
+		field.String("name").Unique(),
 		field.String("description"),
 		field.Int("rank"),
 	}

@@ -1,0 +1,5 @@
+need to fix the multiple sumbits
+
+need to add an "this movie is allready exsist" 
+
+need to connect the movie to the director in submitHandler

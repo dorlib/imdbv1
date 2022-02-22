@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 BACKEND: 
 
 need to add an "this movie is allready exsist" 
@@ -18,3 +19,11 @@ FRONTEND :
 connect every html to css with css.Handler
 
 add a picture to welcome page 
+=======
+Need to work on the review system and review table 
+
+need to add an "this movie is allready exsist" 
+
+need to create rating system avilable in any movie page
+
+>>>>>>> 1fd3671fa0a7b114f2eb438864242dd6e9295886

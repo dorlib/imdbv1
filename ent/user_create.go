@@ -26,19 +26,19 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 	return uc
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
-func (uc *UserCreate) AddUserIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserIDs(ids...)
+// AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
+func (uc *UserCreate) AddReviewIDs(ids ...int) *UserCreate {
+	uc.mutation.AddReviewIDs(ids...)
 	return uc
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (uc *UserCreate) AddUser(r ...*Review) *UserCreate {
+// AddReviews adds the "reviews" edges to the Review entity.
+func (uc *UserCreate) AddReviews(r ...*Review) *UserCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return uc.AddUserIDs(ids...)
+	return uc.AddReviewIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -149,12 +149,12 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if nodes := uc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.ReviewsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

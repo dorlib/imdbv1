@@ -23,7 +23,10 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "movie" package.
 	MoviesInverseTable = "movies"
 	// UserTable is the table that holds the user relation/edge. The primary key declared below.
-	UserTable = "review_user"
+	UserTable = "user_reviews"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
 )
 
 // Columns holds all SQL columns for review fields.
@@ -33,30 +36,19 @@ var Columns = []string{
 	FieldRank,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "reviews"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"user_user",
-}
-
 var (
 	// MoviesPrimaryKey and MoviesColumn2 are the table columns denoting the
 	// primary key for the movies relation (M2M).
 	MoviesPrimaryKey = []string{"review_id", "movie_id"}
 	// UserPrimaryKey and UserColumn2 are the table columns denoting the
 	// primary key for the user relation (M2M).
-	UserPrimaryKey = []string{"review_id", "user_id"}
+	UserPrimaryKey = []string{"user_id", "review_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

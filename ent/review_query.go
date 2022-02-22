@@ -6,6 +6,7 @@ import (
 	"IMDB/ent/movie"
 	"IMDB/ent/predicate"
 	"IMDB/ent/review"
+	"IMDB/ent/user"
 	"context"
 	"database/sql/driver"
 	"errors"
@@ -28,8 +29,7 @@ type ReviewQuery struct {
 	predicates []predicate.Review
 	// eager-loading edges.
 	withMovies *MovieQuery
-	withUser   *ReviewQuery
-	withFKs    bool
+	withUser   *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -89,8 +89,8 @@ func (rq *ReviewQuery) QueryMovies() *MovieQuery {
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (rq *ReviewQuery) QueryUser() *ReviewQuery {
-	query := &ReviewQuery{config: rq.config}
+func (rq *ReviewQuery) QueryUser() *UserQuery {
+	query := &UserQuery{config: rq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +101,8 @@ func (rq *ReviewQuery) QueryUser() *ReviewQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, selector),
-			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, review.UserTable, review.UserPrimaryKey...),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.UserTable, review.UserPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -312,8 +312,8 @@ func (rq *ReviewQuery) WithMovies(opts ...func(*MovieQuery)) *ReviewQuery {
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *ReviewQuery) WithUser(opts ...func(*ReviewQuery)) *ReviewQuery {
-	query := &ReviewQuery{config: rq.config}
+func (rq *ReviewQuery) WithUser(opts ...func(*UserQuery)) *ReviewQuery {
+	query := &UserQuery{config: rq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -385,16 +385,12 @@ func (rq *ReviewQuery) prepareQuery(ctx context.Context) error {
 func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	var (
 		nodes       = []*Review{}
-		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [2]bool{
 			rq.withMovies != nil,
 			rq.withUser != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, review.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Review{config: rq.config}
 		nodes = append(nodes, node)
@@ -486,7 +482,7 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
-			node.Edges.User = []*Review{}
+			node.Edges.User = []*User{}
 		}
 		var (
 			edgeids []int
@@ -494,12 +490,12 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
+				Inverse: true,
 				Table:   review.UserTable,
 				Columns: review.UserPrimaryKey,
 			},
 			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(review.UserPrimaryKey[0], fks...))
+				s.Where(sql.InValues(review.UserPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
 				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
@@ -529,7 +525,7 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 		if err := sqlgraph.QueryEdges(ctx, rq.driver, _spec); err != nil {
 			return nil, fmt.Errorf(`query edges "user": %w`, err)
 		}
-		query.Where(review.IDIn(edgeids...))
+		query.Where(user.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err

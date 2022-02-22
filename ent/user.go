@@ -24,20 +24,20 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// User holds the value of the user edge.
-	User []*Review `json:"user,omitempty"`
+	// Reviews holds the value of the reviews edge.
+	Reviews []*Review `json:"reviews,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
+// ReviewsOrErr returns the Reviews value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserOrErr() ([]*Review, error) {
+func (e UserEdges) ReviewsOrErr() ([]*Review, error) {
 	if e.loadedTypes[0] {
-		return e.User, nil
+		return e.Reviews, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "reviews"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -81,9 +81,9 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
-// QueryUser queries the "user" edge of the User entity.
-func (u *User) QueryUser() *ReviewQuery {
-	return (&UserClient{config: u.config}).QueryUser(u)
+// QueryReviews queries the "reviews" edge of the User entity.
+func (u *User) QueryReviews() *ReviewQuery {
+	return (&UserClient{config: u.config}).QueryReviews(u)
 }
 
 // Update returns a builder for updating this User.

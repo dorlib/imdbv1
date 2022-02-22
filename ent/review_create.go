@@ -5,6 +5,7 @@ package ent
 import (
 	"IMDB/ent/movie"
 	"IMDB/ent/review"
+	"IMDB/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -27,8 +28,8 @@ func (rc *ReviewCreate) SetText(s string) *ReviewCreate {
 }
 
 // SetRank sets the "rank" field.
-func (rc *ReviewCreate) SetRank(f float32) *ReviewCreate {
-	rc.mutation.SetRank(f)
+func (rc *ReviewCreate) SetRank(i int) *ReviewCreate {
+	rc.mutation.SetRank(i)
 	return rc
 }
 
@@ -47,17 +48,17 @@ func (rc *ReviewCreate) AddMovies(m ...*Movie) *ReviewCreate {
 	return rc.AddMovieIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
+// AddUserIDs adds the "user" edge to the User entity by IDs.
 func (rc *ReviewCreate) AddUserIDs(ids ...int) *ReviewCreate {
 	rc.mutation.AddUserIDs(ids...)
 	return rc
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (rc *ReviewCreate) AddUser(r ...*Review) *ReviewCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// AddUser adds the "user" edges to the User entity.
+func (rc *ReviewCreate) AddUser(u ...*User) *ReviewCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return rc.AddUserIDs(ids...)
 }
@@ -175,7 +176,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.Rank(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat32,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: review.FieldRank,
 		})
@@ -203,14 +204,14 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	if nodes := rc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}

@@ -100,7 +100,7 @@ func Text(v string) predicate.Review {
 }
 
 // Rank applies equality check predicate on the "rank" field. It's identical to RankEQ.
-func Rank(v float32) predicate.Review {
+func Rank(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRank), v))
 	})
@@ -218,21 +218,21 @@ func TextContainsFold(v string) predicate.Review {
 }
 
 // RankEQ applies the EQ predicate on the "rank" field.
-func RankEQ(v float32) predicate.Review {
+func RankEQ(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRank), v))
 	})
 }
 
 // RankNEQ applies the NEQ predicate on the "rank" field.
-func RankNEQ(v float32) predicate.Review {
+func RankNEQ(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldRank), v))
 	})
 }
 
 // RankIn applies the In predicate on the "rank" field.
-func RankIn(vs ...float32) predicate.Review {
+func RankIn(vs ...int) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -249,7 +249,7 @@ func RankIn(vs ...float32) predicate.Review {
 }
 
 // RankNotIn applies the NotIn predicate on the "rank" field.
-func RankNotIn(vs ...float32) predicate.Review {
+func RankNotIn(vs ...int) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -266,28 +266,28 @@ func RankNotIn(vs ...float32) predicate.Review {
 }
 
 // RankGT applies the GT predicate on the "rank" field.
-func RankGT(v float32) predicate.Review {
+func RankGT(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldRank), v))
 	})
 }
 
 // RankGTE applies the GTE predicate on the "rank" field.
-func RankGTE(v float32) predicate.Review {
+func RankGTE(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldRank), v))
 	})
 }
 
 // RankLT applies the LT predicate on the "rank" field.
-func RankLT(v float32) predicate.Review {
+func RankLT(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldRank), v))
 	})
 }
 
 // RankLTE applies the LTE predicate on the "rank" field.
-func RankLTE(v float32) predicate.Review {
+func RankLTE(v int) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldRank), v))
 	})
@@ -327,19 +327,19 @@ func HasUser() predicate.Review {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(UserTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, UserTable, UserPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.Review) predicate.Review {
+func HasUserWith(preds ...predicate.User) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, UserTable, UserPrimaryKey...),
+			sqlgraph.To(UserInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

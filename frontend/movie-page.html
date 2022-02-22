@@ -10,19 +10,34 @@
             <a href="/site">Back to main page</a>
         </nav>
         <h2>Welcome To The Page Of The Movie:</h2>
-        {{with .movie}}
+        {{ with .movie}}
         {{ .Name }}
-        {{end}}
+        {{ end }}
 
         <h2>By:</h2>
-        {{with .directorOfMovie}}
-        {{ .Name}}
-        {{end}}
-        {{with .movie}}
+        {{ with .directorOfMovie}}
+        {{ .Name }}
+        {{ end }}
+        {{ with .movie}}
        <h4>short description : {{ .Description }}</h4>  
         
-        <h2>(Rank: {{ .Rank}}/100)</h2>
-        {{end}}
-    </body>
+        <h2>(Rank: {{ .Rank}}/100)</h2> <a href="/rank/{{.ID}}">Add Your Rank!</a>
+        {{ end }}
 
+        <h1>Users Reviews</h1> <a href="/review/{{.ID}}">Add Your Review!</a>
+
+        {{ with .reviewsOfMovie}}
+        {{range .}}
+        <section id="revs">
+        <p>
+            By:
+        </p>
+        <p>
+            {{ .Text}}
+        </p>
+        </section> 
+        {{ end }}
+        {{ end }}
+
+    </body>
 </html>

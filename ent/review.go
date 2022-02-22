@@ -18,11 +18,10 @@ type Review struct {
 	// Text holds the value of the "text" field.
 	Text string `json:"text,omitempty"`
 	// Rank holds the value of the "rank" field.
-	Rank float32 `json:"rank,omitempty"`
+	Rank int `json:"rank,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
-	Edges     ReviewEdges `json:"edges"`
-	user_user *int
+	Edges ReviewEdges `json:"edges"`
 }
 
 // ReviewEdges holds the relations/edges for other nodes in the graph.
@@ -30,7 +29,7 @@ type ReviewEdges struct {
 	// Movies holds the value of the movies edge.
 	Movies []*Movie `json:"movies,omitempty"`
 	// User holds the value of the user edge.
-	User []*Review `json:"user,omitempty"`
+	User []*User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -47,7 +46,7 @@ func (e ReviewEdges) MoviesOrErr() ([]*Movie, error) {
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading.
-func (e ReviewEdges) UserOrErr() ([]*Review, error) {
+func (e ReviewEdges) UserOrErr() ([]*User, error) {
 	if e.loadedTypes[1] {
 		return e.User, nil
 	}
@@ -59,14 +58,10 @@ func (*Review) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case review.FieldRank:
-			values[i] = new(sql.NullFloat64)
-		case review.FieldID:
+		case review.FieldID, review.FieldRank:
 			values[i] = new(sql.NullInt64)
 		case review.FieldText:
 			values[i] = new(sql.NullString)
-		case review.ForeignKeys[0]: // user_user
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Review", columns[i])
 		}
@@ -95,17 +90,10 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 				r.Text = value.String
 			}
 		case review.FieldRank:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field rank", values[i])
 			} else if value.Valid {
-				r.Rank = float32(value.Float64)
-			}
-		case review.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_user", value)
-			} else if value.Valid {
-				r.user_user = new(int)
-				*r.user_user = int(value.Int64)
+				r.Rank = int(value.Int64)
 			}
 		}
 	}
@@ -118,7 +106,7 @@ func (r *Review) QueryMovies() *MovieQuery {
 }
 
 // QueryUser queries the "user" edge of the Review entity.
-func (r *Review) QueryUser() *ReviewQuery {
+func (r *Review) QueryUser() *UserQuery {
 	return (&ReviewClient{config: r.config}).QueryUser(r)
 }
 

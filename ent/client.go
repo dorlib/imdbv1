@@ -474,14 +474,14 @@ func (c *ReviewClient) QueryMovies(r *Review) *MovieQuery {
 }
 
 // QueryUser queries the user edge of a Review.
-func (c *ReviewClient) QueryUser(r *Review) *ReviewQuery {
-	query := &ReviewQuery{config: c.config}
+func (c *ReviewClient) QueryUser(r *Review) *UserQuery {
+	query := &UserQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, id),
-			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, review.UserTable, review.UserPrimaryKey...),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.UserTable, review.UserPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -579,15 +579,15 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
-// QueryUser queries the user edge of a User.
-func (c *UserClient) QueryUser(u *User) *ReviewQuery {
+// QueryReviews queries the reviews edge of a User.
+func (c *UserClient) QueryReviews(u *User) *ReviewQuery {
 	query := &ReviewQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.UserTable, user.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ReviewsTable, user.ReviewsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

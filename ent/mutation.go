@@ -1049,8 +1049,8 @@ type ReviewMutation struct {
 	typ           string
 	id            *int
 	text          *string
-	rank          *float32
-	addrank       *float32
+	rank          *int
+	addrank       *int
 	clearedFields map[string]struct{}
 	movies        map[int]struct{}
 	removedmovies map[int]struct{}
@@ -1198,13 +1198,13 @@ func (m *ReviewMutation) ResetText() {
 }
 
 // SetRank sets the "rank" field.
-func (m *ReviewMutation) SetRank(f float32) {
-	m.rank = &f
+func (m *ReviewMutation) SetRank(i int) {
+	m.rank = &i
 	m.addrank = nil
 }
 
 // Rank returns the value of the "rank" field in the mutation.
-func (m *ReviewMutation) Rank() (r float32, exists bool) {
+func (m *ReviewMutation) Rank() (r int, exists bool) {
 	v := m.rank
 	if v == nil {
 		return
@@ -1215,7 +1215,7 @@ func (m *ReviewMutation) Rank() (r float32, exists bool) {
 // OldRank returns the old "rank" field's value of the Review entity.
 // If the Review object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldRank(ctx context.Context) (v float32, err error) {
+func (m *ReviewMutation) OldRank(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRank is only allowed on UpdateOne operations")
 	}
@@ -1229,17 +1229,17 @@ func (m *ReviewMutation) OldRank(ctx context.Context) (v float32, err error) {
 	return oldValue.Rank, nil
 }
 
-// AddRank adds f to the "rank" field.
-func (m *ReviewMutation) AddRank(f float32) {
+// AddRank adds i to the "rank" field.
+func (m *ReviewMutation) AddRank(i int) {
 	if m.addrank != nil {
-		*m.addrank += f
+		*m.addrank += i
 	} else {
-		m.addrank = &f
+		m.addrank = &i
 	}
 }
 
 // AddedRank returns the value that was added to the "rank" field in this mutation.
-func (m *ReviewMutation) AddedRank() (r float32, exists bool) {
+func (m *ReviewMutation) AddedRank() (r int, exists bool) {
 	v := m.addrank
 	if v == nil {
 		return
@@ -1307,7 +1307,7 @@ func (m *ReviewMutation) ResetMovies() {
 	m.removedmovies = nil
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by ids.
+// AddUserIDs adds the "user" edge to the User entity by ids.
 func (m *ReviewMutation) AddUserIDs(ids ...int) {
 	if m.user == nil {
 		m.user = make(map[int]struct{})
@@ -1317,17 +1317,17 @@ func (m *ReviewMutation) AddUserIDs(ids ...int) {
 	}
 }
 
-// ClearUser clears the "user" edge to the Review entity.
+// ClearUser clears the "user" edge to the User entity.
 func (m *ReviewMutation) ClearUser() {
 	m.cleareduser = true
 }
 
-// UserCleared reports if the "user" edge to the Review entity was cleared.
+// UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *ReviewMutation) UserCleared() bool {
 	return m.cleareduser
 }
 
-// RemoveUserIDs removes the "user" edge to the Review entity by IDs.
+// RemoveUserIDs removes the "user" edge to the User entity by IDs.
 func (m *ReviewMutation) RemoveUserIDs(ids ...int) {
 	if m.removeduser == nil {
 		m.removeduser = make(map[int]struct{})
@@ -1338,7 +1338,7 @@ func (m *ReviewMutation) RemoveUserIDs(ids ...int) {
 	}
 }
 
-// RemovedUser returns the removed IDs of the "user" edge to the Review entity.
+// RemovedUser returns the removed IDs of the "user" edge to the User entity.
 func (m *ReviewMutation) RemovedUserIDs() (ids []int) {
 	for id := range m.removeduser {
 		ids = append(ids, id)
@@ -1429,7 +1429,7 @@ func (m *ReviewMutation) SetField(name string, value ent.Value) error {
 		m.SetText(v)
 		return nil
 	case review.FieldRank:
-		v, ok := value.(float32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1466,7 +1466,7 @@ func (m *ReviewMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ReviewMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case review.FieldRank:
-		v, ok := value.(float32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1622,17 +1622,17 @@ func (m *ReviewMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	clearedFields map[string]struct{}
-	user          map[int]struct{}
-	removeduser   map[int]struct{}
-	cleareduser   bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op             Op
+	typ            string
+	id             *int
+	name           *string
+	clearedFields  map[string]struct{}
+	reviews        map[int]struct{}
+	removedreviews map[int]struct{}
+	clearedreviews bool
+	done           bool
+	oldValue       func(context.Context) (*User, error)
+	predicates     []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -1769,58 +1769,58 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by ids.
-func (m *UserMutation) AddUserIDs(ids ...int) {
-	if m.user == nil {
-		m.user = make(map[int]struct{})
+// AddReviewIDs adds the "reviews" edge to the Review entity by ids.
+func (m *UserMutation) AddReviewIDs(ids ...int) {
+	if m.reviews == nil {
+		m.reviews = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.user[ids[i]] = struct{}{}
+		m.reviews[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUser clears the "user" edge to the Review entity.
-func (m *UserMutation) ClearUser() {
-	m.cleareduser = true
+// ClearReviews clears the "reviews" edge to the Review entity.
+func (m *UserMutation) ClearReviews() {
+	m.clearedreviews = true
 }
 
-// UserCleared reports if the "user" edge to the Review entity was cleared.
-func (m *UserMutation) UserCleared() bool {
-	return m.cleareduser
+// ReviewsCleared reports if the "reviews" edge to the Review entity was cleared.
+func (m *UserMutation) ReviewsCleared() bool {
+	return m.clearedreviews
 }
 
-// RemoveUserIDs removes the "user" edge to the Review entity by IDs.
-func (m *UserMutation) RemoveUserIDs(ids ...int) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[int]struct{})
+// RemoveReviewIDs removes the "reviews" edge to the Review entity by IDs.
+func (m *UserMutation) RemoveReviewIDs(ids ...int) {
+	if m.removedreviews == nil {
+		m.removedreviews = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
+		delete(m.reviews, ids[i])
+		m.removedreviews[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUser returns the removed IDs of the "user" edge to the Review entity.
-func (m *UserMutation) RemovedUserIDs() (ids []int) {
-	for id := range m.removeduser {
+// RemovedReviews returns the removed IDs of the "reviews" edge to the Review entity.
+func (m *UserMutation) RemovedReviewsIDs() (ids []int) {
+	for id := range m.removedreviews {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UserIDs returns the "user" edge IDs in the mutation.
-func (m *UserMutation) UserIDs() (ids []int) {
-	for id := range m.user {
+// ReviewsIDs returns the "reviews" edge IDs in the mutation.
+func (m *UserMutation) ReviewsIDs() (ids []int) {
+	for id := range m.reviews {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUser resets all changes to the "user" edge.
-func (m *UserMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-	m.removeduser = nil
+// ResetReviews resets all changes to the "reviews" edge.
+func (m *UserMutation) ResetReviews() {
+	m.reviews = nil
+	m.clearedreviews = false
+	m.removedreviews = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -1942,8 +1942,8 @@ func (m *UserMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.user != nil {
-		edges = append(edges, user.EdgeUser)
+	if m.reviews != nil {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -1952,9 +1952,9 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
+	case user.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.reviews))
+		for id := range m.reviews {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1965,8 +1965,8 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removeduser != nil {
-		edges = append(edges, user.EdgeUser)
+	if m.removedreviews != nil {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -1975,9 +1975,9 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
+	case user.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.removedreviews))
+		for id := range m.removedreviews {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1988,8 +1988,8 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.cleareduser {
-		edges = append(edges, user.EdgeUser)
+	if m.clearedreviews {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -1998,8 +1998,8 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
-	case user.EdgeUser:
-		return m.cleareduser
+	case user.EdgeReviews:
+		return m.clearedreviews
 	}
 	return false
 }
@@ -2016,8 +2016,8 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
-	case user.EdgeUser:
-		m.ResetUser()
+	case user.EdgeReviews:
+		m.ResetReviews()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

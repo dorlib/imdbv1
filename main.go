@@ -97,10 +97,12 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 
 		movie := c.Movie.GetX(r.Context(), int(idInt))
 		directorOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryDirector().OnlyX(r.Context())
+		reviewsOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryReview().AllX(r.Context())
 
 		if err := t.Execute(w, M{
 			"movie":           movie,
 			"directorOfMovie": directorOfMovie,
+			"reviewsOfMovie":  reviewsOfMovie,
 		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
@@ -126,14 +128,18 @@ func submitHandler(t *template.Template, c *ent.Client) http.Handler {
 		mName := r.PostForm.Get("movie")
 		mDirector := r.PostForm.Get("director")
 		mRank, _ := strconv.Atoi(r.PostForm.Get("ranking"))
+		mReview := r.PostForm.Get("rev")
 
 		newMovie := c.Movie.Create().SetName(mName).SetDescription(mDescription).SetRank(mRank).SaveX(r.Context())
 		newDirector := c.Director.Create().SetName(mDirector).SaveX(r.Context())
 		newMovieID := c.Movie.Query().Where(movie.Name(newMovie.Name)).OnlyIDX(r.Context())
 		newMovieToDirector := c.Director.UpdateOne(newDirector).AddMovieIDs(newMovieID).SaveX(r.Context())
+		newReview := c.Review.Create().SetText(mReview).SetRank(mRank).SaveX(r.Context())
+		newReviewToMovie := c.Movie.UpdateOne(newMovie).AddReview(newReview).SaveX(r.Context())
 
 		fmt.Println("new movie added:", newMovie, "new Director added:", newDirector)
-		fmt.Println("new conecction made:", newMovieToDirector)
+		fmt.Println("new conecctions made:", newMovieToDirector, newReviewToMovie)
+		fmt.Println("new review added:", newReview)
 
 	})
 }

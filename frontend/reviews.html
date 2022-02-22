@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta name="Reviews" content="with=device-width, initial-scale=1.0">
+        <title>IMDB</title>
+        <link rel="stylesheet" href="reviewsStype.css">
+    </head>
+   
+    <body>
+        <nav>
+            <a href="./site">Back to main page</a>
+        </nav>
+    
+        <h2>The Reviews Of The Movie :</h2>
+        {{ with .movie}}
+        {{ .Name}}
+        {{ end }}
+        {{ with .reviewsOfMovie }}
+             <p>
+                {{ .Text}} 
+             </p>
+             <p>
+                 {{ .Rank}}
+             </p>
+     {{ end }}
+    </body>
+
+</html>

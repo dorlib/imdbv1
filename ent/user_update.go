@@ -34,19 +34,19 @@ func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	return uu
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
-func (uu *UserUpdate) AddUserIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddUserIDs(ids...)
+// AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
+func (uu *UserUpdate) AddReviewIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddReviewIDs(ids...)
 	return uu
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (uu *UserUpdate) AddUser(r ...*Review) *UserUpdate {
+// AddReviews adds the "reviews" edges to the Review entity.
+func (uu *UserUpdate) AddReviews(r ...*Review) *UserUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return uu.AddUserIDs(ids...)
+	return uu.AddReviewIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -54,25 +54,25 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearUser clears all "user" edges to the Review entity.
-func (uu *UserUpdate) ClearUser() *UserUpdate {
-	uu.mutation.ClearUser()
+// ClearReviews clears all "reviews" edges to the Review entity.
+func (uu *UserUpdate) ClearReviews() *UserUpdate {
+	uu.mutation.ClearReviews()
 	return uu
 }
 
-// RemoveUserIDs removes the "user" edge to Review entities by IDs.
-func (uu *UserUpdate) RemoveUserIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveUserIDs(ids...)
+// RemoveReviewIDs removes the "reviews" edge to Review entities by IDs.
+func (uu *UserUpdate) RemoveReviewIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveReviewIDs(ids...)
 	return uu
 }
 
-// RemoveUser removes "user" edges to Review entities.
-func (uu *UserUpdate) RemoveUser(r ...*Review) *UserUpdate {
+// RemoveReviews removes "reviews" edges to Review entities.
+func (uu *UserUpdate) RemoveReviews(r ...*Review) *UserUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return uu.RemoveUserIDs(ids...)
+	return uu.RemoveReviewIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -154,12 +154,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldName,
 		})
 	}
-	if uu.mutation.UserCleared() {
+	if uu.mutation.ReviewsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -170,12 +170,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedUserIDs(); len(nodes) > 0 && !uu.mutation.UserCleared() {
+	if nodes := uu.mutation.RemovedReviewsIDs(); len(nodes) > 0 && !uu.mutation.ReviewsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -189,12 +189,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.ReviewsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -233,19 +233,19 @@ func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	return uuo
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
-func (uuo *UserUpdateOne) AddUserIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddUserIDs(ids...)
+// AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
+func (uuo *UserUpdateOne) AddReviewIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddReviewIDs(ids...)
 	return uuo
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (uuo *UserUpdateOne) AddUser(r ...*Review) *UserUpdateOne {
+// AddReviews adds the "reviews" edges to the Review entity.
+func (uuo *UserUpdateOne) AddReviews(r ...*Review) *UserUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return uuo.AddUserIDs(ids...)
+	return uuo.AddReviewIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -253,25 +253,25 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearUser clears all "user" edges to the Review entity.
-func (uuo *UserUpdateOne) ClearUser() *UserUpdateOne {
-	uuo.mutation.ClearUser()
+// ClearReviews clears all "reviews" edges to the Review entity.
+func (uuo *UserUpdateOne) ClearReviews() *UserUpdateOne {
+	uuo.mutation.ClearReviews()
 	return uuo
 }
 
-// RemoveUserIDs removes the "user" edge to Review entities by IDs.
-func (uuo *UserUpdateOne) RemoveUserIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveUserIDs(ids...)
+// RemoveReviewIDs removes the "reviews" edge to Review entities by IDs.
+func (uuo *UserUpdateOne) RemoveReviewIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveReviewIDs(ids...)
 	return uuo
 }
 
-// RemoveUser removes "user" edges to Review entities.
-func (uuo *UserUpdateOne) RemoveUser(r ...*Review) *UserUpdateOne {
+// RemoveReviews removes "reviews" edges to Review entities.
+func (uuo *UserUpdateOne) RemoveReviews(r ...*Review) *UserUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return uuo.RemoveUserIDs(ids...)
+	return uuo.RemoveReviewIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -377,12 +377,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Column: user.FieldName,
 		})
 	}
-	if uuo.mutation.UserCleared() {
+	if uuo.mutation.ReviewsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -393,12 +393,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedUserIDs(); len(nodes) > 0 && !uuo.mutation.UserCleared() {
+	if nodes := uuo.mutation.RemovedReviewsIDs(); len(nodes) > 0 && !uuo.mutation.ReviewsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -412,12 +412,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.ReviewsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTable,
-			Columns: []string{user.UserColumn},
+			Table:   user.ReviewsTable,
+			Columns: user.ReviewsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

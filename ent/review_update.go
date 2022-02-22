@@ -6,6 +6,7 @@ import (
 	"IMDB/ent/movie"
 	"IMDB/ent/predicate"
 	"IMDB/ent/review"
+	"IMDB/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -35,15 +36,15 @@ func (ru *ReviewUpdate) SetText(s string) *ReviewUpdate {
 }
 
 // SetRank sets the "rank" field.
-func (ru *ReviewUpdate) SetRank(f float32) *ReviewUpdate {
+func (ru *ReviewUpdate) SetRank(i int) *ReviewUpdate {
 	ru.mutation.ResetRank()
-	ru.mutation.SetRank(f)
+	ru.mutation.SetRank(i)
 	return ru
 }
 
-// AddRank adds f to the "rank" field.
-func (ru *ReviewUpdate) AddRank(f float32) *ReviewUpdate {
-	ru.mutation.AddRank(f)
+// AddRank adds i to the "rank" field.
+func (ru *ReviewUpdate) AddRank(i int) *ReviewUpdate {
+	ru.mutation.AddRank(i)
 	return ru
 }
 
@@ -62,17 +63,17 @@ func (ru *ReviewUpdate) AddMovies(m ...*Movie) *ReviewUpdate {
 	return ru.AddMovieIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
+// AddUserIDs adds the "user" edge to the User entity by IDs.
 func (ru *ReviewUpdate) AddUserIDs(ids ...int) *ReviewUpdate {
 	ru.mutation.AddUserIDs(ids...)
 	return ru
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (ru *ReviewUpdate) AddUser(r ...*Review) *ReviewUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// AddUser adds the "user" edges to the User entity.
+func (ru *ReviewUpdate) AddUser(u ...*User) *ReviewUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ru.AddUserIDs(ids...)
 }
@@ -103,23 +104,23 @@ func (ru *ReviewUpdate) RemoveMovies(m ...*Movie) *ReviewUpdate {
 	return ru.RemoveMovieIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the Review entity.
+// ClearUser clears all "user" edges to the User entity.
 func (ru *ReviewUpdate) ClearUser() *ReviewUpdate {
 	ru.mutation.ClearUser()
 	return ru
 }
 
-// RemoveUserIDs removes the "user" edge to Review entities by IDs.
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
 func (ru *ReviewUpdate) RemoveUserIDs(ids ...int) *ReviewUpdate {
 	ru.mutation.RemoveUserIDs(ids...)
 	return ru
 }
 
-// RemoveUser removes "user" edges to Review entities.
-func (ru *ReviewUpdate) RemoveUser(r ...*Review) *ReviewUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// RemoveUser removes "user" edges to User entities.
+func (ru *ReviewUpdate) RemoveUser(u ...*User) *ReviewUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ru.RemoveUserIDs(ids...)
 }
@@ -205,14 +206,14 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.Rank(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat32,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: review.FieldRank,
 		})
 	}
 	if value, ok := ru.mutation.AddedRank(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat32,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: review.FieldRank,
 		})
@@ -274,14 +275,14 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -290,14 +291,14 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.RemovedUserIDs(); len(nodes) > 0 && !ru.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -309,14 +310,14 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -351,15 +352,15 @@ func (ruo *ReviewUpdateOne) SetText(s string) *ReviewUpdateOne {
 }
 
 // SetRank sets the "rank" field.
-func (ruo *ReviewUpdateOne) SetRank(f float32) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetRank(i int) *ReviewUpdateOne {
 	ruo.mutation.ResetRank()
-	ruo.mutation.SetRank(f)
+	ruo.mutation.SetRank(i)
 	return ruo
 }
 
-// AddRank adds f to the "rank" field.
-func (ruo *ReviewUpdateOne) AddRank(f float32) *ReviewUpdateOne {
-	ruo.mutation.AddRank(f)
+// AddRank adds i to the "rank" field.
+func (ruo *ReviewUpdateOne) AddRank(i int) *ReviewUpdateOne {
+	ruo.mutation.AddRank(i)
 	return ruo
 }
 
@@ -378,17 +379,17 @@ func (ruo *ReviewUpdateOne) AddMovies(m ...*Movie) *ReviewUpdateOne {
 	return ruo.AddMovieIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the Review entity by IDs.
+// AddUserIDs adds the "user" edge to the User entity by IDs.
 func (ruo *ReviewUpdateOne) AddUserIDs(ids ...int) *ReviewUpdateOne {
 	ruo.mutation.AddUserIDs(ids...)
 	return ruo
 }
 
-// AddUser adds the "user" edges to the Review entity.
-func (ruo *ReviewUpdateOne) AddUser(r ...*Review) *ReviewUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// AddUser adds the "user" edges to the User entity.
+func (ruo *ReviewUpdateOne) AddUser(u ...*User) *ReviewUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ruo.AddUserIDs(ids...)
 }
@@ -419,23 +420,23 @@ func (ruo *ReviewUpdateOne) RemoveMovies(m ...*Movie) *ReviewUpdateOne {
 	return ruo.RemoveMovieIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the Review entity.
+// ClearUser clears all "user" edges to the User entity.
 func (ruo *ReviewUpdateOne) ClearUser() *ReviewUpdateOne {
 	ruo.mutation.ClearUser()
 	return ruo
 }
 
-// RemoveUserIDs removes the "user" edge to Review entities by IDs.
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
 func (ruo *ReviewUpdateOne) RemoveUserIDs(ids ...int) *ReviewUpdateOne {
 	ruo.mutation.RemoveUserIDs(ids...)
 	return ruo
 }
 
-// RemoveUser removes "user" edges to Review entities.
-func (ruo *ReviewUpdateOne) RemoveUser(r ...*Review) *ReviewUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// RemoveUser removes "user" edges to User entities.
+func (ruo *ReviewUpdateOne) RemoveUser(u ...*User) *ReviewUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ruo.RemoveUserIDs(ids...)
 }
@@ -545,14 +546,14 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	}
 	if value, ok := ruo.mutation.Rank(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat32,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: review.FieldRank,
 		})
 	}
 	if value, ok := ruo.mutation.AddedRank(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat32,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: review.FieldRank,
 		})
@@ -614,14 +615,14 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	if ruo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -630,14 +631,14 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	if nodes := ruo.mutation.RemovedUserIDs(); len(nodes) > 0 && !ruo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -649,14 +650,14 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	if nodes := ruo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   review.UserTable,
 			Columns: review.UserPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: review.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}

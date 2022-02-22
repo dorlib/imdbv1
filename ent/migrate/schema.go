@@ -22,7 +22,7 @@ var (
 	// MoviesColumns holds the columns for the "movies" table.
 	MoviesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "rank", Type: field.TypeInt},
 		{Name: "director_movies", Type: field.TypeInt, Nullable: true},
@@ -45,22 +45,13 @@ var (
 	ReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "text", Type: field.TypeString},
-		{Name: "rank", Type: field.TypeFloat32},
-		{Name: "user_user", Type: field.TypeInt, Nullable: true},
+		{Name: "rank", Type: field.TypeInt},
 	}
 	// ReviewsTable holds the schema information for the "reviews" table.
 	ReviewsTable = &schema.Table{
 		Name:       "reviews",
 		Columns:    ReviewsColumns,
 		PrimaryKey: []*schema.Column{ReviewsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "reviews_users_user",
-				Columns:    []*schema.Column{ReviewsColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -98,26 +89,26 @@ var (
 			},
 		},
 	}
-	// ReviewUserColumns holds the columns for the "review_user" table.
-	ReviewUserColumns = []*schema.Column{
-		{Name: "review_id", Type: field.TypeInt},
+	// UserReviewsColumns holds the columns for the "user_reviews" table.
+	UserReviewsColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeInt},
+		{Name: "review_id", Type: field.TypeInt},
 	}
-	// ReviewUserTable holds the schema information for the "review_user" table.
-	ReviewUserTable = &schema.Table{
-		Name:       "review_user",
-		Columns:    ReviewUserColumns,
-		PrimaryKey: []*schema.Column{ReviewUserColumns[0], ReviewUserColumns[1]},
+	// UserReviewsTable holds the schema information for the "user_reviews" table.
+	UserReviewsTable = &schema.Table{
+		Name:       "user_reviews",
+		Columns:    UserReviewsColumns,
+		PrimaryKey: []*schema.Column{UserReviewsColumns[0], UserReviewsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "review_user_review_id",
-				Columns:    []*schema.Column{ReviewUserColumns[0]},
-				RefColumns: []*schema.Column{ReviewsColumns[0]},
+				Symbol:     "user_reviews_user_id",
+				Columns:    []*schema.Column{UserReviewsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "review_user_user_id",
-				Columns:    []*schema.Column{ReviewUserColumns[1]},
+				Symbol:     "user_reviews_review_id",
+				Columns:    []*schema.Column{UserReviewsColumns[1]},
 				RefColumns: []*schema.Column{ReviewsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -130,15 +121,14 @@ var (
 		ReviewsTable,
 		UsersTable,
 		ReviewMoviesTable,
-		ReviewUserTable,
+		UserReviewsTable,
 	}
 )
 
 func init() {
 	MoviesTable.ForeignKeys[0].RefTable = DirectorsTable
-	ReviewsTable.ForeignKeys[0].RefTable = UsersTable
 	ReviewMoviesTable.ForeignKeys[0].RefTable = ReviewsTable
 	ReviewMoviesTable.ForeignKeys[1].RefTable = MoviesTable
-	ReviewUserTable.ForeignKeys[0].RefTable = ReviewsTable
-	ReviewUserTable.ForeignKeys[1].RefTable = ReviewsTable
+	UserReviewsTable.ForeignKeys[0].RefTable = UsersTable
+	UserReviewsTable.ForeignKeys[1].RefTable = ReviewsTable
 }

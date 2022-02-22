@@ -9,17 +9,15 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeReviews holds the string denoting the reviews edge name in mutations.
+	EdgeReviews = "reviews"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "reviews"
-	// UserInverseTable is the table name for the Review entity.
+	// ReviewsTable is the table that holds the reviews relation/edge. The primary key declared below.
+	ReviewsTable = "user_reviews"
+	// ReviewsInverseTable is the table name for the Review entity.
 	// It exists in this package in order to avoid circular dependency with the "review" package.
-	UserInverseTable = "reviews"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_user"
+	ReviewsInverseTable = "reviews"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -27,6 +25,12 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 }
+
+var (
+	// ReviewsPrimaryKey and ReviewsColumn2 are the table columns denoting the
+	// primary key for the reviews relation (M2M).
+	ReviewsPrimaryKey = []string{"user_id", "review_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

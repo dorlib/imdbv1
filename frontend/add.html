@@ -19,7 +19,7 @@
 				<h1>Create a Movie!</h1>
         <section class="movie">
           <label for="movie">What is the name of the movie?</label>
-    			<input type="text" name="movie" id="movie">
+    			<input type="text" name="movie" id="movie" required>
           <label for="year">Year?</label>
     			<input type="number" name="year" id="year" min="1940" max="2022">
         </section>
@@ -37,7 +37,7 @@
         
       <section class="director">
         <label for="director">What is the name of the director?</label>
-        <input type="text" name="director" id="director">
+        <input type="text" name="director" id="director" required>
       </section>
       <hr>
 
@@ -52,7 +52,7 @@
         
         <section class="ranking">
           <label for="ranking">Choose the rank that you like to give to this movie</label>
-          <input type="number" name="ranking" id="ranking" min="0" max="100">
+          <input type="number" name="ranking" id="ranking" min="0" max="100" required>
         </section>
         <hr>
         
@@ -97,14 +97,14 @@
         <section class="description">
           <label for="extra">Please add a short description about the movie</label>
           <br>
-          <textarea id="extra" name="extra" rows="3" cols="40"></textarea>
+          <textarea id="extra" name="extra" rows="3" cols="40" required></textarea>
         </section>
         <hr>
 
         <section class="review">
             <label for="rev">Please add a short review about the movie</label>
             <br>
-            <textarea id="rev" name="rev" rows="3" cols="40"></textarea>
+            <textarea id="rev" name="rev" rows="3" cols="40" required></textarea>
           </section>
         <hr>
 

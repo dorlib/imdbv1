@@ -106,6 +106,25 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
+
+		if r.Method != "POST" {
+			http.Redirect(w, r, "/site", http.StatusSeeOther)
+			return
+		}
+
+		er := r.ParseForm()
+		if err != nil {
+			log.Fatal(er)
+		}
+
+		mReview := r.PostFormValue("newRev")
+		mRank, _ := strconv.Atoi(r.PostFormValue("newRank"))
+		movID := movie.ID
+
+		newReview := c.Review.Create().SetText(mReview).SetRank(mRank).SaveX(r.Context())
+		newReviewToMovie := c.Movie.UpdateOneID(movID).AddReview(newReview).SaveX(r.Context())
+
+		fmt.Println("new review added", newReviewToMovie)
 	})
 }
 

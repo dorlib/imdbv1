@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html>
-
+    <html>
+        <html lang="en" dir="ltr">
+    <link>
+    <title>Forms Review</title>
+    <meta charset="utf-8">
+    <meta name="movie-page" content="with=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
     <head>
         <title>IMDB</title>
     </head>
    
-    <body>
+    <>
         <nav>
             <a href="/site">Back to main page</a>
         </nav>
@@ -24,7 +29,7 @@
         <h2>(Rank: {{ .Rank}}/100)</h2> <a href="/rank/{{.ID}}">Add Your Rank!</a>
         {{ end }}
 
-        <h1>Users Reviews</h1> <a href="/review/{{.ID}}">Add Your Review!</a>
+        <h1>Users Reviews</h1>
 
         {{ with .reviewsOfMovie}}
         {{range .}}
@@ -39,5 +44,18 @@
         {{ end }}
         {{ end }}
 
+        <hr>
+        <form action="submission.html" method="POST">
+            <h1>Add Your Review!</h1>
+            <section class="newRev">
+                <br>
+                <textarea id="newRev" name="newRev" rows="3" cols="40"></textarea>
+              </section>
+              <section class="newRank">
+                <label for="ranking">Choose the rank</label>
+                <input type="number" name="newRank" id="newRank" min="0" max="100">
+            </section>
+            <input type="submit" value="submit">
+        </form>
     </body>
 </html>

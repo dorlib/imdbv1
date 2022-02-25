@@ -5,10 +5,6 @@ need to add an "this movie is allready exsist"
 
 add an option to update movie details 
 
-add an option to add rank 
-
-add an option to add review
-
 add users and names to reveiws of the user gave it 
 
 what happend when a new movie is created with the same director ? fix this problem (users need to be able to add a new movie with existing director)

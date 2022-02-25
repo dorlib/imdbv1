@@ -4,6 +4,7 @@
     <link>
     <title>Forms Review</title>
     <meta charset="utf-8">
+    <form action="/submissionRev.html" method="POST">
     <meta name="movie-page" content="with=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
     <head>
@@ -25,7 +26,14 @@
         {{ with .movie}}
        <h4>short description : {{ .Description }}</h4>  
         
-        <h2>(Rank: {{ .Rank}}/100)</h2> <a href="/rank/{{.ID}}">Add Your Rank!</a>
+        <h2>(Rank: {{ .Rank}}/100)</h2>
+        <section class="rnk">
+            <button type="button" id="theButton" onclick="clickMe()">Add Your Rank!</button>
+            <input type="number" name="rnk" id="rnk" min="0" max="100" style="display: none;" required>
+        </section>
+        <section class="sub">
+            <input type="submit" value="submit" style="display:none;">
+        </section>
         {{ end }}
 
         <h1>Users Reviews</h1>
@@ -44,19 +52,25 @@
         {{ end }}
 
     <hr>
-    <form action="/submissionRev.html" method="POST">
         <h1>Add Your Review!</h1>
             <section class="txt">
                 <br>
                 <textarea id="txt" name="txt" rows="3" cols="40"></textarea>
             </section>
-            <section class="rnk">
-                <label for="rnk">Choose the rank</label>
-                <input type="number" name="rnk" id="rnk" min="0" max="100">
-            </section>
             <section class="submission">
                 <input type="submit" value="submit">
             </section>
         </form>
+
+            <script>
+
+    function clickMe() {
+    var text = document.getElementById("rnk")
+    var sub = document.getElementsByTagName("input")[1]
+    text.style.display = window.getComputedStyle(text, null).display === 'none' ? 'block' : 'none'
+    sub.style.display = window.getComputedStyle(sub, null).display === 'none' ? 'block' : 'none'
+  }
+        </script>
+
     </body>
 </html>

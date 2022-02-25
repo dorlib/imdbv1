@@ -5,9 +5,9 @@ need to add an "this movie is allready exsist"
 
 add an option to update movie details 
 
-add an option and a new screen just to add rank 
+add an option to add rank 
 
-add an option and a new screen just to add review
+add an option to add review
 
 add users and names to reveiws of the user gave it 
 

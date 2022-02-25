@@ -87,6 +87,8 @@ func addhHandler(t *template.Template) http.Handler {
 	})
 }
 
+var OutID int
+
 func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := path.Base(r.URL.Path) // a/b/c/d => d, a/b => b, a => a
@@ -94,6 +96,8 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		if err != nil {
 			panic(err)
 		}
+
+		OutID = int(idInt)
 
 		movie := c.Movie.GetX(r.Context(), int(idInt))
 		directorOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryDirector().OnlyX(r.Context())
@@ -106,6 +110,14 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
+	})
+}
+
+func submitReviewHandler(t *template.Template, c *ent.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
 
 		if r.Method != "POST" {
 			http.Redirect(w, r, "/site", http.StatusSeeOther)
@@ -113,16 +125,15 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		}
 
 		er := r.ParseForm()
-		if err != nil {
+		if er != nil {
 			log.Fatal(er)
 		}
 
-		mReview := r.PostFormValue("newRev")
-		mRank, _ := strconv.Atoi(r.PostFormValue("newRank"))
-		movID := movie.ID
+		mReview := r.PostForm.Get("txt")
+		mRank, _ := strconv.Atoi(r.PostForm.Get("rnk"))
 
 		newReview := c.Review.Create().SetText(mReview).SetRank(mRank).SaveX(r.Context())
-		newReviewToMovie := c.Movie.UpdateOneID(movID).AddReview(newReview).SaveX(r.Context())
+		newReviewToMovie := c.Movie.UpdateOneID(OutID).AddReview(newReview).SaveX(r.Context())
 
 		fmt.Println("new review added", newReviewToMovie)
 	})
@@ -229,6 +240,7 @@ func main() {
 	addTpl := template.Must(template.ParseFiles("frontend/add.html"))
 	movieTpl := template.Must(template.ParseFiles("frontend/movie-page.html"))
 	submitTpl := template.Must(template.ParseFiles("frontend/submission.html"))
+	submitReviewTpl := template.Must(template.ParseFiles("frontend/submissionRev.html"))
 	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
 	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
 
@@ -239,6 +251,7 @@ func main() {
 	http.Handle("/add", addhHandler(addTpl))
 	http.Handle("/movie/", moviePageHandler(movieTpl, client))
 	http.Handle("/submission.html", submitHandler(submitTpl, client))
+	http.Handle("/submissionRev.html", submitReviewHandler(submitReviewTpl, client))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
 

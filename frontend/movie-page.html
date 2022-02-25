@@ -10,7 +10,6 @@
         <title>IMDB</title>
     </head>
    
-    <>
         <nav>
             <a href="/site">Back to main page</a>
         </nav>
@@ -44,18 +43,20 @@
         {{ end }}
         {{ end }}
 
-        <hr>
-        <form action="submission.html" method="POST">
-            <h1>Add Your Review!</h1>
-            <section class="newRev">
+    <hr>
+    <form action="/submissionRev.html" method="POST">
+        <h1>Add Your Review!</h1>
+            <section class="txt">
                 <br>
-                <textarea id="newRev" name="newRev" rows="3" cols="40"></textarea>
-              </section>
-              <section class="newRank">
-                <label for="ranking">Choose the rank</label>
-                <input type="number" name="newRank" id="newRank" min="0" max="100">
+                <textarea id="txt" name="txt" rows="3" cols="40"></textarea>
             </section>
-            <input type="submit" value="submit">
+            <section class="rnk">
+                <label for="rnk">Choose the rank</label>
+                <input type="number" name="rnk" id="rnk" min="0" max="100">
+            </section>
+            <section class="submission">
+                <input type="submit" value="submit">
+            </section>
         </form>
     </body>
 </html>

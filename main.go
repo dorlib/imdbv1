@@ -102,11 +102,17 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		movie := c.Movie.GetX(r.Context(), int(idInt))
 		directorOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryDirector().OnlyX(r.Context())
 		reviewsOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryReview().AllX(r.Context())
+		sumOfRanks := c.Movie.GetX(r.Context(), int(idInt)).Rank
+		for _, r := range reviewsOfMovie {
+			sumOfRanks += r.Rank
+		}
+		ranksOfMovie := sumOfRanks / (len(reviewsOfMovie) + 1)
 
 		if err := t.Execute(w, M{
 			"movie":           movie,
 			"directorOfMovie": directorOfMovie,
 			"reviewsOfMovie":  reviewsOfMovie,
+			"rankOfMovie":     ranksOfMovie,
 		}); err != nil {
 			http.Error(w, fmt.Sprintf("error executing template (%s)", err), http.StatusInternalServerError)
 		}
@@ -131,13 +137,22 @@ func submitReviewHandler(t *template.Template, c *ent.Client) http.Handler {
 
 		mReview := r.PostForm.Get("txt")
 		mRank, _ := strconv.Atoi(r.PostForm.Get("rnk"))
-
 		newReview := c.Review.Create().SetText(mReview).SetRank(mRank).SaveX(r.Context())
 		newReviewToMovie := c.Movie.UpdateOneID(OutID).AddReview(newReview).SaveX(r.Context())
 
 		fmt.Println("new review added", newReviewToMovie)
 	})
 }
+
+/*
+func submitRankHandler(t *template.Template, c *ent.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+*/
 
 func submitHandler(t *template.Template, c *ent.Client) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -243,6 +258,7 @@ func main() {
 	submitReviewTpl := template.Must(template.ParseFiles("frontend/submissionRev.html"))
 	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
 	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
+	//submitRankTpl := template.Must(template.ParseFiles("frontend/submissionRank.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
@@ -254,6 +270,7 @@ func main() {
 	http.Handle("/submissionRev.html", submitReviewHandler(submitReviewTpl, client))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
+	//http.Handle("/submissionRank.html", submitRankHandler(submitRankTpl, client))
 
 	fs := http.FileServer(http.Dir("css"))
 	http.Handle("/frontend/css/", http.StripPrefix("/frontend/css/", fs))

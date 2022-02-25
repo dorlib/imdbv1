@@ -25,8 +25,8 @@
         {{ end }}
         {{ with .movie}}
        <h4>short description : {{ .Description }}</h4>  
-        
-        <h2>(Rank: {{ .Rank}}/100)</h2>
+        {{end}}
+        <h2>(Rank: {{ $.rankOfMovie}}/100)</h2>
         <section class="rnk">
             <button type="button" id="theButton" onclick="clickMe()">Add Your Rank!</button>
             <input type="number" name="rnk" id="rnk" min="0" max="100" style="display: none;" required>
@@ -34,19 +34,20 @@
         <section class="sub">
             <input type="submit" value="submit" style="display:none;">
         </section>
-        {{ end }}
 
         <h1>Users Reviews</h1>
 
         {{ with .reviewsOfMovie}}
-        {{range .}}
+        {{ range .}}
         <section id="revs">
+            {{ if .Text }}
         <p>
             By:
         </p>
         <p>
             {{ .Text}}
         </p>
+            {{ end }}
         </section> 
         {{ end }}
         {{ end }}

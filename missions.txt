@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 BACKEND: 
 
-need to add an "this movie is allready exsist" 
+need to add an "this movie is allready exsist" - need to read about JSON API 
 
 add an option to update movie details 
 
@@ -9,18 +9,12 @@ add users and names to reveiws of the user gave it
 
 create a user
 
-what happend when a new movie is created with the same director ? fix this problem (users need to be able to add a new movie with existing director)
-
-
 FRONTEND : 
 
 connect every html to css with css.Handler
 
 add a picture to welcome page 
 =======
-Need to work on the review system and review table 
-
-Need to make rank a different table and make a ranking system 
 
 need to add an "this movie is allready exsist" 
 

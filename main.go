@@ -102,11 +102,16 @@ func moviePageHandler(t *template.Template, c *ent.Client) http.Handler {
 		movie := c.Movie.GetX(r.Context(), int(idInt))
 		directorOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryDirector().OnlyX(r.Context())
 		reviewsOfMovie := c.Movie.GetX(r.Context(), int(idInt)).QueryReview().AllX(r.Context())
+		len := len(reviewsOfMovie)
 		sumOfRanks := c.Movie.GetX(r.Context(), int(idInt)).Rank
 		for _, r := range reviewsOfMovie {
 			sumOfRanks += r.Rank
+			if r.Rank == 0 {
+				len -= 1
+			}
+
 		}
-		ranksOfMovie := sumOfRanks / (len(reviewsOfMovie) + 1)
+		ranksOfMovie := sumOfRanks / (len + 1)
 
 		if err := t.Execute(w, M{
 			"movie":           movie,
@@ -144,16 +149,6 @@ func submitReviewHandler(t *template.Template, c *ent.Client) http.Handler {
 	})
 }
 
-/*
-func submitRankHandler(t *template.Template, c *ent.Client) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := t.Execute(w, nil); err != nil {
-			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
-		}
-	})
-}
-*/
-
 func submitHandler(t *template.Template, c *ent.Client) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := t.Execute(w, nil); err != nil {
@@ -175,15 +170,42 @@ func submitHandler(t *template.Template, c *ent.Client) http.Handler {
 		mRank, _ := strconv.Atoi(r.PostForm.Get("ranking"))
 		mReview := r.PostForm.Get("rev")
 
+		var directorsList []string
+		DirectorsIDS := c.Director.Query().IDsX(r.Context())
+		for i := 0; i < len(DirectorsIDS); i++ {
+			directorName := c.Director.GetX(r.Context(), DirectorsIDS[i]).Name
+			directorsList = append(directorsList, directorName)
+		}
+
 		newMovie := c.Movie.Create().SetName(mName).SetDescription(mDescription).SetRank(mRank).SaveX(r.Context())
-		newDirector := c.Director.Create().SetName(mDirector).SaveX(r.Context())
 		newMovieID := c.Movie.Query().Where(movie.Name(newMovie.Name)).OnlyIDX(r.Context())
-		newMovieToDirector := c.Director.UpdateOne(newDirector).AddMovieIDs(newMovieID).SaveX(r.Context())
+		var bl bool
+		bl = true
+		var D string
+		var DirectorID int
+
+		for i := 0; i < len(directorsList); i++ {
+			if mDirector == directorsList[i] {
+				bl = false
+				D = directorsList[i]
+			}
+		}
+		var newDirector *ent.Director
+		if bl {
+			newDirector = c.Director.Create().SetName(mDirector).SaveX(r.Context())
+			newMovieToDirector := c.Director.UpdateOne(newDirector).AddMovieIDs(newMovieID).SaveX(r.Context())
+			fmt.Println("new Director added:", newMovieToDirector)
+		} else {
+			DirectorID = c.Director.Query().Where(director.Name(D)).OnlyIDX(r.Context())
+			newMovieToDirector := c.Director.UpdateOneID(DirectorID).AddMovieIDs(newMovieID).SaveX(r.Context())
+			fmt.Println("new conecction made:", newMovieToDirector)
+		}
+
 		newReview := c.Review.Create().SetText(mReview).SetRank(mRank).SaveX(r.Context())
 		newReviewToMovie := c.Movie.UpdateOne(newMovie).AddReview(newReview).SaveX(r.Context())
 
 		fmt.Println("new movie added:", newMovie, "new Director added:", newDirector)
-		fmt.Println("new conecctions made:", newMovieToDirector, newReviewToMovie)
+		fmt.Println("new conecction made:", newReviewToMovie)
 		fmt.Println("new review added:", newReview)
 
 	})
@@ -258,7 +280,6 @@ func main() {
 	submitReviewTpl := template.Must(template.ParseFiles("frontend/submissionRev.html"))
 	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
 	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
-	//submitRankTpl := template.Must(template.ParseFiles("frontend/submissionRank.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
@@ -270,7 +291,6 @@ func main() {
 	http.Handle("/submissionRev.html", submitReviewHandler(submitReviewTpl, client))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
-	//http.Handle("/submissionRank.html", submitRankHandler(submitRankTpl, client))
 
 	fs := http.FileServer(http.Dir("css"))
 	http.Handle("/frontend/css/", http.StripPrefix("/frontend/css/", fs))

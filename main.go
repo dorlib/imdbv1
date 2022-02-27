@@ -79,7 +79,46 @@ func searchHandler(t *template.Template) http.Handler {
 	})
 }
 
-func addhHandler(t *template.Template) http.Handler {
+func addUserHandler(t *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+
+func signHandler(t *template.Template, c *ent.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
+		if r.Method != "POST" {
+			http.Redirect(w, r, "/site", http.StatusSeeOther)
+			return
+		}
+
+		err := r.ParseForm()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		mFirst := r.PostForm.Get("firstname")
+		mLast := r.PostForm.Get("lastname")
+		mDateYear := r.PostForm.Get("year")
+		mDateMonth := r.PostForm.Get("month")
+		mDateDay := r.PostForm.Get("day")
+		mBirthDay := mDateDay + "." + mDateMonth + "." + mDateYear
+		mEmail := r.PostForm.Get("email")
+		mPassword := r.PostForm.Get("password")
+		mDesc := r.PostForm.Get("desc")
+
+		newUser := c.User.Create().SetFirstname(mFirst).SetLastname(mLast).SetEmail(mEmail).SetBirthDay(mBirthDay).SetPassword(mPassword).SetDescription(mDesc).SaveX(r.Context())
+		fmt.Println("new user added:", newUser)
+
+	})
+}
+
+func addHandler(t *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := t.Execute(w, nil); err != nil {
 			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
@@ -280,17 +319,21 @@ func main() {
 	submitReviewTpl := template.Must(template.ParseFiles("frontend/submissionRev.html"))
 	directorsTpl := template.Must(template.ParseFiles("frontend/directors.html"))
 	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
+	addUserPageTpl := template.Must(template.ParseFiles("frontend/addUser.html"))
+	signPageTpl := template.Must(template.ParseFiles("frontend/sign-submission.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
 	http.Handle("/search", searchHandler(searchTpl))
 	http.Handle("/all", allHandler(allTpl, client))
-	http.Handle("/add", addhHandler(addTpl))
+	http.Handle("/add", addHandler(addTpl))
 	http.Handle("/movie/", moviePageHandler(movieTpl, client))
 	http.Handle("/submission.html", submitHandler(submitTpl, client))
 	http.Handle("/submissionRev.html", submitReviewHandler(submitReviewTpl, client))
 	http.Handle("/directors", directorsHandler(directorsTpl, client))
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
+	http.Handle("/sign", addUserHandler(addUserPageTpl))
+	http.Handle("/sign-submission.html", signHandler(signPageTpl, client))
 
 	fs := http.FileServer(http.Dir("css"))
 	http.Handle("/frontend/css/", http.StripPrefix("/frontend/css/", fs))

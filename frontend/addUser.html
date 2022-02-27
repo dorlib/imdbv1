@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <link>
+    <title>Forms Account</title>
+    <link href="./signStyle.css" rel="stylesheet" type="text/css"/>
+    <meta charset="utf-8">
+    <meta name="add" content="with=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+  </head>
+  <body>
+    <nav>
+        <a href="./site">Back to main page</a>
+    </nav> 
+
+    <section id="overlay">
+      <img src="https://cdn1.vectorstock.com/i/1000x1000/57/25/sign-in-with-arrow-icon-login-symbol-vector-10825725.jpg" alt="sign-logo" id="sign-logo">
+      <hr>
+      <form action="sign-submission.html" method="POST">
+				<h1>Create a User!</h1>
+        <section class="username">
+          <label for="username">What is your name?</label>
+    			<input type="text" name="firstname" id="firstname" placeholder="first name" required>
+          <input type="text" name="lastname" id="lastname" placeholder="last name" required>
+        </section>
+
+        <section class="date">
+          <label for="year">Date Of Birth?</label>
+    			<input type="number" name="year" id="year" min="1920" max="2022" placeholder="Year" required>
+                <input type="number" name="month" id="month" min="1" max="12" placeholder="Month" required>
+                <input type="number" name="day" id="day" min="1" max="31" placeholder="Day" required>
+        </section>
+        <hr>
+
+        <section class="user-image">
+          <label for="user-image">Upload Your Favorite Image For Your User (Optional)</label>
+          <div class="choose_file">
+            <span>Choose File</span>
+            <input name="user-image" type="file" />
+        </div>
+        </section>
+        <hr>
+
+        
+        <section class="email">
+            <label for="email">What is your email address?</label>
+            <input type="text" name="email" id="email" required>
+        </section>
+        <hr>
+        
+        <section class="password">
+            <label for="password">Password (8 characters minimum):</label>
+            <input type="password" id="password" name="password" minlength="8" required>
+        </section>
+        <hr>
+
+        <section class="desc">
+          <label for="desc">Please add a short description about yourself</label>
+          <br>
+          <textarea id="desc" name="desc" rows="3" cols="40" placeholder="tell us somthing about yourself"></textarea>
+        </section>
+        <hr>
+
+        <section class="submission">
+          <input type="submit" value="submit">
+        </section>
+      </form>
+    </section>
+  </body>
+</html>

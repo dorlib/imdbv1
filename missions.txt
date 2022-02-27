@@ -9,6 +9,18 @@ add users and names to reveiws of the user gave it
 
 create a user
 
+need to create a user log in page 
+
+need to make history of reviews of a user 
+
+people can make a review and rank only of they logged in to theirs account
+
+making a review shows the name of the user gave it 
+
+need to make a list of movies that a user likes
+
+need to add an option to add "heart" sign to a movie that add this movie to favorite list of a user
+
 FRONTEND : 
 
 connect every html to css with css.Handler
@@ -16,8 +28,8 @@ connect every html to css with css.Handler
 add a picture to welcome page 
 =======
 
-need to add an "this movie is allready exsist" 
+need to add an "this movie is allready exsist"
 
-need to create rating system avilable in any movie page
+need to make a search bar for:movies, directors, users
 
 >>>>>>> 1fd3671fa0a7b114f2eb438864242dd6e9295886

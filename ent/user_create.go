@@ -32,6 +32,12 @@ func (uc *UserCreate) SetLastname(s string) *UserCreate {
 	return uc
 }
 
+// SetNickname sets the "nickname" field.
+func (uc *UserCreate) SetNickname(s string) *UserCreate {
+	uc.mutation.SetNickname(s)
+	return uc
+}
+
 // SetDescription sets the "description" field.
 func (uc *UserCreate) SetDescription(s string) *UserCreate {
 	uc.mutation.SetDescription(s)
@@ -147,6 +153,9 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Lastname(); !ok {
 		return &ValidationError{Name: "lastname", err: errors.New(`ent: missing required field "User.lastname"`)}
 	}
+	if _, ok := uc.mutation.Nickname(); !ok {
+		return &ValidationError{Name: "nickname", err: errors.New(`ent: missing required field "User.nickname"`)}
+	}
 	if _, ok := uc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "User.description"`)}
 	}
@@ -201,6 +210,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldLastname,
 		})
 		_node.Lastname = value
+	}
+	if value, ok := uc.mutation.Nickname(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldNickname,
+		})
+		_node.Nickname = value
 	}
 	if value, ok := uc.mutation.Description(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

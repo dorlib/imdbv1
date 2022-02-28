@@ -79,6 +79,14 @@ func searchHandler(t *template.Template) http.Handler {
 	})
 }
 
+func logInHandler(t *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Execute(w, nil); err != nil {
+			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
+		}
+	})
+}
+
 func addUserHandler(t *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := t.Execute(w, nil); err != nil {
@@ -104,6 +112,7 @@ func signHandler(t *template.Template, c *ent.Client) http.Handler {
 
 		mFirst := r.PostForm.Get("firstname")
 		mLast := r.PostForm.Get("lastname")
+		mNick := r.PostForm.Get("nickname")
 		mDateYear := r.PostForm.Get("year")
 		mDateMonth := r.PostForm.Get("month")
 		mDateDay := r.PostForm.Get("day")
@@ -112,7 +121,7 @@ func signHandler(t *template.Template, c *ent.Client) http.Handler {
 		mPassword := r.PostForm.Get("password")
 		mDesc := r.PostForm.Get("desc")
 
-		newUser := c.User.Create().SetFirstname(mFirst).SetLastname(mLast).SetEmail(mEmail).SetBirthDay(mBirthDay).SetPassword(mPassword).SetDescription(mDesc).SaveX(r.Context())
+		newUser := c.User.Create().SetFirstname(mFirst).SetLastname(mLast).SetEmail(mEmail).SetBirthDay(mBirthDay).SetPassword(mPassword).SetNickname(mNick).SetDescription(mDesc).SaveX(r.Context())
 		fmt.Println("new user added:", newUser)
 
 	})
@@ -321,6 +330,7 @@ func main() {
 	directorPageTpl := template.Must(template.ParseFiles("frontend/director-page.html"))
 	addUserPageTpl := template.Must(template.ParseFiles("frontend/addUser.html"))
 	signPageTpl := template.Must(template.ParseFiles("frontend/sign-submission.html"))
+	logInTpl := template.Must(template.ParseFiles("frontend/login.html"))
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
@@ -334,6 +344,7 @@ func main() {
 	http.Handle("/director/", directorPageHandler(directorPageTpl, client))
 	http.Handle("/sign", addUserHandler(addUserPageTpl))
 	http.Handle("/sign-submission.html", signHandler(signPageTpl, client))
+	http.Handle("/login", logInHandler(logInTpl))
 
 	fs := http.FileServer(http.Dir("css"))
 	http.Handle("/frontend/css/", http.StripPrefix("/frontend/css/", fs))

@@ -40,6 +40,12 @@ func (uu *UserUpdate) SetLastname(s string) *UserUpdate {
 	return uu
 }
 
+// SetNickname sets the "nickname" field.
+func (uu *UserUpdate) SetNickname(s string) *UserUpdate {
+	uu.mutation.SetNickname(s)
+	return uu
+}
+
 // SetDescription sets the "description" field.
 func (uu *UserUpdate) SetDescription(s string) *UserUpdate {
 	uu.mutation.SetDescription(s)
@@ -191,6 +197,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldLastname,
 		})
 	}
+	if value, ok := uu.mutation.Nickname(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldNickname,
+		})
+	}
 	if value, ok := uu.mutation.Description(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -301,6 +314,12 @@ func (uuo *UserUpdateOne) SetFirstname(s string) *UserUpdateOne {
 // SetLastname sets the "lastname" field.
 func (uuo *UserUpdateOne) SetLastname(s string) *UserUpdateOne {
 	uuo.mutation.SetLastname(s)
+	return uuo
+}
+
+// SetNickname sets the "nickname" field.
+func (uuo *UserUpdateOne) SetNickname(s string) *UserUpdateOne {
+	uuo.mutation.SetNickname(s)
 	return uuo
 }
 
@@ -477,6 +496,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: user.FieldLastname,
+		})
+	}
+	if value, ok := uuo.mutation.Nickname(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldNickname,
 		})
 	}
 	if value, ok := uuo.mutation.Description(); ok {

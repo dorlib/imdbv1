@@ -11,6 +11,8 @@ const (
 	FieldFirstname = "firstname"
 	// FieldLastname holds the string denoting the lastname field in the database.
 	FieldLastname = "lastname"
+	// FieldNickname holds the string denoting the nickname field in the database.
+	FieldNickname = "nickname"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldPassword holds the string denoting the password field in the database.
@@ -35,6 +37,7 @@ var Columns = []string{
 	FieldID,
 	FieldFirstname,
 	FieldLastname,
+	FieldNickname,
 	FieldDescription,
 	FieldPassword,
 	FieldEmail,

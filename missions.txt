@@ -3,8 +3,6 @@ BACKEND:
 
 need to add an "this movie is allready exsist" - need to read about JSON API 
 
-add an option to update movie details 
-
 add users and names to reveiws of the user gave it 
 
 need to create a user log in page 
@@ -25,7 +23,6 @@ connect every html to css with css.Handler
 
 add a picture to welcome page 
 
-need to make "dont have an account yet? sign is" only the sign in clickable
 =======
 
 need to add an "this movie is allready exsist"

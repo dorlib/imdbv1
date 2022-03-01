@@ -71,14 +71,6 @@ func siteHandler(t *template.Template) http.Handler {
 	})
 }
 
-func searchHandler(t *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := t.Execute(w, nil); err != nil {
-			http.Error(w, fmt.Sprintf("error excuting template (%s)", err), http.StatusInternalServerError)
-		}
-	})
-}
-
 func logInHandler(t *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := t.Execute(w, nil); err != nil {
@@ -121,7 +113,16 @@ func signHandler(t *template.Template, c *ent.Client) http.Handler {
 		mPassword := r.PostForm.Get("password")
 		mDesc := r.PostForm.Get("desc")
 
-		newUser := c.User.Create().SetFirstname(mFirst).SetLastname(mLast).SetEmail(mEmail).SetBirthDay(mBirthDay).SetPassword(mPassword).SetNickname(mNick).SetDescription(mDesc).SaveX(r.Context())
+		newUser := c.User.
+			Create().
+			SetFirstname(mFirst).
+			SetLastname(mLast).
+			SetEmail(mEmail).
+			SetBirthDay(mBirthDay).
+			SetPassword(mPassword).
+			SetNickname(mNick).
+			SetDescription(mDesc).
+			SaveX(r.Context())
 		fmt.Println("new user added:", newUser)
 
 	})
@@ -320,7 +321,6 @@ func main() {
 
 	top10Tpl := template.Must(template.ParseFiles("frontend/top10.html"))
 	siteTpl := template.Must(template.ParseFiles("frontend/site.html"))
-	searchTpl := template.Must(template.ParseFiles("frontend/search.html"))
 	allTpl := template.Must(template.ParseFiles("frontend/all.html"))
 	addTpl := template.Must(template.ParseFiles("frontend/add.html"))
 	movieTpl := template.Must(template.ParseFiles("frontend/movie-page.html"))
@@ -334,7 +334,6 @@ func main() {
 
 	http.Handle("/top10", top10Handler(top10Tpl, client))
 	http.Handle("/site", siteHandler(siteTpl))
-	http.Handle("/search", searchHandler(searchTpl))
 	http.Handle("/all", allHandler(allTpl, client))
 	http.Handle("/add", addHandler(addTpl))
 	http.Handle("/movie/", moviePageHandler(movieTpl, client))

@@ -6,5 +6,5 @@ This is my first mini project
  ---
  
  This is the first verson of imdb-project
- Check the final project [here]
+ Check the final project [here](https://github.com/dorlib/IMDB-Project)
  
